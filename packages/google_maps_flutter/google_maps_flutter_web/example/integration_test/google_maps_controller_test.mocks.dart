@@ -4,6 +4,7 @@
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'dart:async' as _i6;
+import 'dart:html' as _i7;
 
 import 'package:google_maps/google_maps.dart' as _i4;
 import 'package:google_maps_flutter_platform_interface/google_maps_flutter_platform_interface.dart'
