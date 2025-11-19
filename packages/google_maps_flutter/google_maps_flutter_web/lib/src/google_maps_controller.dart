@@ -108,6 +108,13 @@ class GoogleMapController {
     return _widget;
   }
 
+  // Get current location
+  MyLocationButton? _myLocationButton;
+
+  /// A getter for the my location button
+  @visibleForTesting
+  MyLocationButton? get myLocationButton => _myLocationButton;
+
   // The currently-enabled traffic layer.
   gmaps.TrafficLayer? _trafficLayer;
 
@@ -172,6 +179,7 @@ class GoogleMapController {
     ClusterManagersController? clusterManagers,
     TileOverlaysController? tileOverlays,
     GroundOverlaysController? groundOverlays,
+    Geolocation? geolocation,
   }) {
     _overrideCreateMap = createMap;
     _overrideSetOptions = setOptions;
@@ -183,6 +191,7 @@ class GoogleMapController {
     _clusterManagersController = clusterManagers ?? _clusterManagersController;
     _tileOverlaysController = tileOverlays ?? _tileOverlaysController;
     _groundOverlaysController = groundOverlays ?? _groundOverlaysController;
+    _geolocation = geolocation ?? _geolocation;
   }
 
   DebugCreateMapFunction? _overrideCreateMap;
@@ -245,6 +254,20 @@ class GoogleMapController {
     // Now attach the geometry, traffic and any other layers...
     _renderInitialGeometry();
     _setTrafficLayer(map, _lastMapConfiguration.trafficEnabled ?? false);
+
+    _renderMyLocation(map, _lastMapConfiguration);
+  }
+
+  // Render my location
+  Future<void> _renderMyLocation(
+      gmaps.GMap map, MapConfiguration mapConfiguration) async {
+    if (mapConfiguration.myLocationEnabled ?? false) {
+      if (mapConfiguration.myLocationButtonEnabled ?? false) {
+        _addMyLocationButton(map, this);
+      }
+      await _displayAndWatchMyLocation(this);
+      await _centerMyCurrentLocation(this);
+    }
   }
 
   // Funnels map gmap events into the plugin's stream controller.
@@ -665,6 +688,7 @@ class GoogleMapController {
     _polygonsController = null;
     _polylinesController = null;
     _markersController = null;
+    _myLocationButton = null;
     _clusterManagersController = null;
     _tileOverlaysController = null;
     _groundOverlaysController = null;
